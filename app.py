@@ -3,7 +3,7 @@ import os
 
 import aws_cdk as cdk
 
-from AirflowOnFargateStack import AirflowOnFargateStack
+from infrastructure.stacks.AirflowOnFargateStack import AirflowOnFargateStack
 
 app = cdk.App()
 

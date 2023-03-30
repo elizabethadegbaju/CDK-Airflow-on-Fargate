@@ -15,7 +15,7 @@ class AirflowStack(Stack):
         cluster: ecs.Cluster,
         db_connection_string: str,
         default_security_group: ec2.SecurityGroup,
-        private_subnet_ids: list[ec2.Subnet],
+        private_subnet_ids: list[ec2.ISubnet],
         **kwargs,
     ) -> None:
         super().__init__(scope, id, **kwargs)
