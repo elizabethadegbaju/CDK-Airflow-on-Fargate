@@ -10,6 +10,8 @@ RUN apt-get update \
         libcurl4-gnutls-dev \
         librtmp-dev \
         python3-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
 
 RUN python3 -m pip install psycopg2 argcomplete pycurl
 
