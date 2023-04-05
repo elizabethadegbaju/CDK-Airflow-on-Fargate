@@ -2,5 +2,5 @@ pytest==6.2.5
 black==22.3.0
 flake8==4.0.1
 nodeenv==1.6.0
-aws-cdk-lib==2.63.2
+aws-cdk-lib==2.70.0
 constructs>=10.0.0,<11.0.0

@@ -3,7 +3,7 @@ VENV := .venv
 PYTHON = $(VENV)/bin/python3
 PIP = $(VENV)/bin/pip
 VENV_ACTIVATE=python3 -m venv $(VENV) && . $(VENV)/bin/activate
-CDK = npx aws-cdk@2.63.0
+CDK = npx aws-cdk@2.70.0
 
 # venv is a shortcut target
 venv: $(VENV)/bin/activate
