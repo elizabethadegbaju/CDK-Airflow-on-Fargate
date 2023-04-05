@@ -9,7 +9,7 @@ airflow users create \
   --firstname admin \
   --lastname admin \
   --role Admin \
-  --email "${ADMIN_EMAIL}" \
+  --email "testemail@test.de" \
   --password "${ADMIN_PASSWORD}"
 sleep 5
 airflow webserver
