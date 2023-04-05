@@ -11,8 +11,8 @@ class ContainerConfig:
         cpu: int = 256,
         memory: int = 512,
     ):
-        self.entryPoint = entry_point
-        self.containerPort = container_port
+        self.entry_point = entry_point
+        self.container_port = container_port
         self.name = name
         self.cpu = cpu
         self.memory = memory
@@ -26,7 +26,7 @@ class AirflowTaskConfig:
         webserver_config: ContainerConfig,
         scheduler_config: ContainerConfig,
         worker_config: ContainerConfig,
-        logs_retention: RetentionDays,
+        log_retention: RetentionDays,
         create_worker_pool: bool = False,
     ):
         self.cpu = cpu
@@ -34,7 +34,7 @@ class AirflowTaskConfig:
         self.webserver_config = webserver_config
         self.scheduler_config = scheduler_config
         self.worker_config = worker_config
-        self.logs_config = logs_retention
+        self.log_retention = log_retention
         self.create_worker_pool = create_worker_pool
 
 
@@ -57,7 +57,7 @@ class DBConfig:
         self,
         db_name: str,
         db_master_user: str,
-        db_port: str,
+        db_port: int,
         db_instance_type: InstanceType,
         db_storage_size: int,
         db_backup_retention: int,
@@ -94,7 +94,7 @@ airflow_task_config = AirflowTaskConfig(
     webserver_config=default_webserver_config,
     scheduler_config=default_scheduler_config,
     worker_config=default_worker_config,
-    logs_retention=RetentionDays.ONE_MONTH,
+    log_retention=RetentionDays.ONE_MONTH,
     # To have a dedicated worker pool, set this to True
     # create_worker_pool=True
 )
@@ -102,7 +102,7 @@ airflow_task_config = AirflowTaskConfig(
 default_db_config = DBConfig(
     db_name="airflow",
     db_master_user="airflow",
-    db_port="5432",
+    db_port=5432,
     db_instance_type=InstanceType.of(
         InstanceClass.T3,
         InstanceSize.SMALL,

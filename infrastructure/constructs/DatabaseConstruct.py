@@ -11,7 +11,7 @@ from constructs import Construct
 from infrastructure.config import default_db_config, DBConfig
 
 
-class DatabaseStack(Stack):
+class DatabaseConstruct(Construct):
     def __init__(
         self,
         scope: Construct,
@@ -21,7 +21,7 @@ class DatabaseStack(Stack):
         db_config: default_db_config = default_db_config,
         **kwargs,
     ) -> None:
-        super().__init__(scope, id, **kwargs)
+        super().__init__(scope, id)
 
         backend_secret = secretsmanager.Secret(
             self,
@@ -49,7 +49,7 @@ class DatabaseStack(Stack):
             self,
             "AirflowDB",
             engine=rds.DatabaseInstanceEngine.postgres(
-                version=rds.PostgresEngineVersion.VER_13_2
+                version=rds.PostgresEngineVersion.VER_15_2
             ),
             instance_type=db_config.db_instance_type,
             vpc=vpc,

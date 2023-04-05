@@ -1,12 +1,12 @@
 from aws_cdk import aws_ec2 as ec2, aws_ecs as ecs, Stack, CfnOutput
 from constructs import Construct
-from aws_cdk.aws_ecr_assets import DockerImageAsset
+from aws_cdk.aws_ecr_assets import DockerImageAsset, Platform
 from infrastructure.config import airflow_task_config
-from ServiceStack import ServiceStack
+from infrastructure.constructs.ServiceConstruct import ServiceConstruct
 from uuid import uuid4
 
 
-class AirflowStack(Stack):
+class AirflowConstruct(Construct):
     def __init__(
         self,
         scope: Construct,
@@ -18,19 +18,20 @@ class AirflowStack(Stack):
         private_subnet_ids: list[ec2.ISubnet],
         **kwargs,
     ) -> None:
-        super().__init__(scope, id, **kwargs)
+        super().__init__(scope, id)
         admin_password = str(uuid4())
+
         # Set environment variables
         environment = {
-            "AIRFLOW__CORE__SQL_ALCHEMY_CONN": db_connection_string,
+            "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN": db_connection_string,
             "AIRFLOW__CORE__EXECUTOR": "CeleryExecutor",
             "AIRFLOW__CELERY__BROKER_URL": "sqs://",
             "AIRFLOW__CELERY__RESULT_BACKEND": f"db+{db_connection_string}",
-            "AIRFLOW_WEBSERVER__RBAC": "True",
+            "AIRFLOW__WEBSERVER__RBAC": "True",
             "ADMIN_PASSWORD": admin_password,
             "CLUSTER": cluster.cluster_name,
             "SUBNETS": ",".join([subnet.subnet_id for subnet in private_subnet_ids]),
-            "SECURITY_GROUPS": default_security_group.security_group_id,
+            "SECURITY_GROUP": default_security_group.security_group_id,
         }
 
         logging = ecs.AwsLogDriver(
@@ -43,6 +44,7 @@ class AirflowStack(Stack):
             self,
             "AirflowImage",
             directory="./airflow",
+            platform=Platform.LINUX_AMD64
         )
 
         # Create task definitions
@@ -83,7 +85,7 @@ class AirflowStack(Stack):
             )
 
         # Create service
-        ServiceStack(
+        ServiceConstruct(
             self,
             "AirflowService",
             cluster=cluster,
@@ -92,7 +94,7 @@ class AirflowStack(Stack):
             default_security_group=default_security_group,
         )
         if airflow_task_config.create_worker_pool:
-            ServiceStack(
+            ServiceConstruct(
                 self,
                 "WorkerService",
                 cluster=cluster,

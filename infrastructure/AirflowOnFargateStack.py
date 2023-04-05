@@ -1,8 +1,9 @@
 from aws_cdk import aws_ec2 as ec2, aws_ecs as ecs, Stack, Tags
 from constructs import Construct
 
-from infrastructure.stacks.AirflowStack import AirflowStack
-from infrastructure.stacks.DatabaseStack import DatabaseStack
+from infrastructure.constructs.AirflowConstruct import AirflowConstruct
+from infrastructure.constructs.DagTasksConstruct import DagTasksConstruct
+from infrastructure.constructs.DatabaseConstruct import DatabaseConstruct
 
 
 class AirflowOnFargateStack(Stack):
@@ -37,7 +38,7 @@ class AirflowOnFargateStack(Stack):
         )
 
         # Create a database stack with a PostgreSQL database instance for Airflow
-        db = DatabaseStack(
+        db = DatabaseConstruct(
             self,
             "RDS-PostgreSQL",
             vpc=vpc,
@@ -45,7 +46,7 @@ class AirflowOnFargateStack(Stack):
         )
 
         # Create an Airflow stack with a webserver service, a worker service, and a scheduler service
-        AirflowStack(
+        AirflowConstruct(
             self,
             "AirflowService",
             vpc=vpc,
@@ -53,4 +54,12 @@ class AirflowOnFargateStack(Stack):
             cluster=cluster,
             db_connection_string=db.db_connection_string,
             private_subnet_ids=vpc.private_subnets,
+        )
+
+        # Create Task Definitions for on-demand Fargate Tasks invoked from DAGs
+        DagTasksConstruct(
+            self,
+            "DagTasks",
+            vpc=vpc,
+            default_security_group=default_security_group,
         )

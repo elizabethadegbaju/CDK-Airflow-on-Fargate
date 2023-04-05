@@ -12,7 +12,7 @@ from constructs import Construct
 from infrastructure.config import worker_autoscaling_config
 
 
-class ServiceStack(Stack):
+class ServiceConstruct(Construct):
     def __init__(
         self,
         scope: Construct,
@@ -24,16 +24,16 @@ class ServiceStack(Stack):
         is_worker_service: bool = False,
         **kwargs,
     ) -> None:
-        super().__init__(scope, id, **kwargs)
+        super().__init__(scope, id)
 
         # Attach required policies to the Task Role
         policies = [
-            ManagedPolicy.fromAwsManagedPolicyName("AmazonSQSFullAccess"),
-            ManagedPolicy.fromAwsManagedPolicyName("AmazonECS_FullAccess"),
-            ManagedPolicy.fromAwsManagedPolicyName(
+            ManagedPolicy.from_aws_managed_policy_name("AmazonSQSFullAccess"),
+            ManagedPolicy.from_aws_managed_policy_name("AmazonECS_FullAccess"),
+            ManagedPolicy.from_aws_managed_policy_name(
                 "AmazonElasticFileSystemClientReadWriteAccess"
             ),
-            ManagedPolicy.fromAwsManagedPolicyName("CloudWatchLogsReadOnlyAccess"),
+            ManagedPolicy.from_aws_managed_policy_name("CloudWatchLogsReadOnlyAccess"),
         ]
         for policy in policies:
             task_definition.task_role.add_managed_policy(policy)
@@ -83,9 +83,6 @@ class ServiceStack(Stack):
             port=80,
             targets=[self._fargate_service],
             health_check=elbv2.HealthCheck(
-                path="/health",
-                interval=Duration.seconds(60),
-                timeout=Duration.seconds(5),
                 healthy_threshold_count=2,
                 unhealthy_threshold_count=2,
             ),
